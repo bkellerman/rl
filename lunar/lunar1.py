@@ -20,8 +20,6 @@ class DQNLunar2Solver():
 
         self.memory = deque(maxlen=10000000)
         self.env = gym.make('LunarLander-v2')
-        #self.env = gym.wrappers.Monitor(self.env, os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) +
-        #                               '/lunarlander_monitor_nopretrain_eps995_lr001', video_callable=every100, force=True)
 
         self.env = gym.wrappers.Monitor(self.env, 'vid', video_callable=EVERY_100, force=True)
 
@@ -46,9 +44,8 @@ class DQNLunar2Solver():
     def _build_model(self):
         self.opt = Adam(lr=self.alpha)
         model = Sequential()
-        model.add(Dense(256, input_shape=(8,), activation='relu'))
-        model.add(Dense(128, activation='relu'))
-        model.add(Dense(128, activation='relu'))
+        model.add(Dense(256, input_shape=(8,), activation='tanh'))
+        model.add(Dense(128, activation='tanh'))
         model.add(Dense(4, activation='linear'))
         model.compile(loss='mse', optimizer=self.opt)
         return model
