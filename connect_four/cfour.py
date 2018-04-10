@@ -1,6 +1,5 @@
 # https://gist.github.com/poke
 from itertools import groupby, chain
-from random import randint
 import random
 import numpy as np
 
@@ -8,12 +7,12 @@ NONE = '.'
 RED = 'R'
 YELLOW = 'Y'
 
-def diagonalsPos (matrix, cols, rows):
+def diagonals_pos(matrix, cols, rows):
     """Get positive diagonals, going from bottom-left to top-right."""
     for di in ([(j, i - j) for j in range(cols)] for i in range(cols + rows -1)):
         yield [matrix[i][j] for i, j in di if i >= 0 and j >= 0 and i < cols and j < rows]
 
-def diagonalsNeg (matrix, cols, rows):
+def diagonals_neg(matrix, cols, rows):
     """Get negative diagonals, going from top-left to bottom-right."""
     for di in ([(j, i - cols + j + 1) for j in range(cols)] for i in range(cols + rows - 1)):
         yield [matrix[i][j] for i, j in di if i >= 0 and j >= 0 and i < cols and j < rows]
@@ -53,20 +52,12 @@ def print_board(board, cols, rows):
     print()
 
 class Game:
-    def __init__ (self, cols = 5, rows = 4, win = 3):
+    def __init__(self, cols=5, rows=4, win=3):
         """Create a new game."""
         self.cols = cols
         self.rows = rows
         self.win = win
         self.board = [[NONE] * rows for _ in range(cols)]
-
-    def n_tokens(self):
-        n = 0
-        for x in range(self.cols):
-            for y in range(self.rows):
-                if self.board[x][y] != NONE:
-                    n += 1
-        return n
 
     def active_cols(self):
         cols = []
@@ -140,26 +131,19 @@ class Game:
 
     def check_for_win(self):
         """Check the current board for a winner."""
-        w = self.get_winner()
-        if w:
-            return True
-        else:
-            return False
+        return bool(self.get_winner())
 
     def get_winner(self):
         """Get the winner on the current board."""
-        lines = (
-                self.board, # columns
-                zip(*self.board), # rows
-                diagonalsPos(self.board, self.cols, self.rows), # positive diagonals
-                diagonalsNeg(self.board, self.cols, self.rows) # negative diagonals
-                )
-        #print("Getting winner")
+        lines = (self.board, # columns
+                 zip(*self.board), # rows
+                 diagonals_pos(self.board, self.cols, self.rows), # positive diagonals
+                 diagonals_neg(self.board, self.cols, self.rows)) # negative diagonals
+
         for line in chain(*lines):
             for color, group in groupby(line):
                 if color != NONE and len(list(group)) >= self.win:
                     return color
-        #print("No winner")
 
     def state(self):
         state = np.zeros((self.cols, self.rows, 3))
